@@ -6,19 +6,20 @@ import { useRoute } from "@react-navigation/native";
 
 const LoginScreen = () => {
   const navigation = useNavigation();
-  const [phonenumber, setPhonenumber] = useState("99111199");
-  const [password, setPassword] = useState("0000");
+  const [phonenumber, setPhonenumber] = useState("");
+  const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
   const route = useRoute();
 
   const handleLogin = async () => {
     try {
       const response = await login({
-        phone: 99111199,
-        password: "0000",
+        phone: phonenumber,
+        password: password,
       });
       if (response.status === 200) {
         const userData = response.data.data;
+        await AsyncStorage.setItem("loggedIn", "true");
         navigation.navigate("Home", { user: userData });
       }
     } catch (error) {
@@ -36,7 +37,7 @@ const LoginScreen = () => {
       <View style={styles.inputContainer}>
         <TextInput
           style={styles.input}
-          placeholder="Phone Number"
+          placeholder="Имайл оруулах"
           value={phonenumber}
           onChangeText={setPhonenumber}
         />

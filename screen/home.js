@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   View,
   Text,
@@ -24,10 +24,23 @@ const HomeScreen = () => {
   const [task, setTask] = useState("");
   const [selectedImage, setSelectedImage] = useState([]);
 
+  useEffect(() => {
+    const checkLoginStatus = async () => {
+      try {
+        const loggedIn = await AsyncStorage.getItem("loggedIn");
+        if (loggedIn === "true") {
+          navigation.navigate("Main", { screen: "Home" });
+        }
+      } catch (error) {
+        console.error("Error checking login status:", error);
+      }
+    };
+
+    checkLoginStatus();
+  }, []);
   const profile = () => {
     navigation.navigate("Login");
   };
-  // navigation.navigate("Home", { user: userData });
 
   const handlePickImage = () => {
     // Implement image picking logic here

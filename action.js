@@ -9,7 +9,7 @@ const instance = axios.create({
 
 export const login = async ({ phone, password }) => {
   return instance.post("/login", {
-    phonenumber: phone,
+    email: phone,
     password: password,
   });
 };

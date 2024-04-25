@@ -14,14 +14,13 @@ const RegisterScreen = () => {
   const onSubmit = async (data) => {
     data.phonenumber = parseInt(data.phonenumber);
     data.usertypeid = parseInt(data.usertypeid);
-    console.log(data);
-    // try {
-    //   const response = await register(data);
-    //   console.log("Registration successful:", response.data);
-    //   // navigation.navigate("Login");
-    // } catch (error) {
-    //   console.error("Registration failed:", error);
-    // }
+    try {
+      const response = await register(data);
+      console.log("Registration successful:", response.data);
+      // navigation.navigate("Login");
+    } catch (error) {
+      console.error("Registration failed:", error);
+    }
   };
 
   return (
