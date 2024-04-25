@@ -1,88 +1,142 @@
-import React, { useState } from 'react';
-import { View, Text, TextInput, Button, StyleSheet } from 'react-native';
-import { useNavigation } from '@react-navigation/native';
+import React, { useState } from "react";
+import { View, Text, TextInput, Button, StyleSheet } from "react-native";
+import { useNavigation } from "@react-navigation/native";
+import { useForm, Controller, handleSubmit } from "react-hook-form";
+import { register } from "../action";
 
 const RegisterScreen = () => {
-  const navigation = useNavigation();
-  const [username, setUsername] = useState('');
-  const [firstName, setFirstName] = useState('');
-  const [lastName, setLastName] = useState('');
-  const [phoneNumber, setPhoneNumber] = useState('');
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [confirmPassword, setConfirmPassword] = useState('');
+  const {
+    control,
+    handleSubmit,
+    // formState: { errors },
+  } = useForm();
 
-
-  const handleRegister = () => {
-    console.log('Username:', username);
-    console.log('First Name:', firstName);
-    console.log('Last Name:', lastName);
-    console.log('Phone Number:', phoneNumber);
-    console.log('Email:', email);
-    console.log('Password:', password);
-    console.log('Confirm Password:', confirmPassword);
+  const onSubmit = async (data) => {
+    data.phonenumber = parseInt(data.phonenumber);
+    data.usertypeid = parseInt(data.usertypeid);
+    console.log(data);
+    // try {
+    //   const response = await register(data);
+    //   console.log("Registration successful:", response.data);
+    //   // navigation.navigate("Login");
+    // } catch (error) {
+    //   console.error("Registration failed:", error);
+    // }
   };
 
   return (
     <View style={styles.container}>
       <Text style={styles.title}>Бүртгүүлэх</Text>
-      <TextInput
-        style={styles.input}
-        placeholder="Хэрэглэгчийн нэр"
-        value={username}
-        onChangeText={setUsername}
-      />
-      <TextInput
-        style={styles.input}
-        placeholder="Нэр"
-        value={firstName}
-        onChangeText={setFirstName}
-      />
-      <TextInput
-        style={styles.input}
-        placeholder="Овог"
-        value={lastName}
-        onChangeText={setLastName}
-      />
-      <TextInput
-        style={styles.input}
-        placeholder="Утас"
-        value={phoneNumber}
-        onChangeText={setPhoneNumber}
-        keyboardType="phone-pad"
-      />
-      <TextInput
-        style={styles.input}
-        placeholder="И-мэйл хаяг"
-        value={email}
-        onChangeText={setEmail}
-        keyboardType="email-address"
-        autoCapitalize="none"
-      />
-      <TextInput
-        style={styles.input}
-        placeholder="Нууц үг"
-        value={password}
-        onChangeText={setPassword}
-        secureTextEntry
-      />
-      <TextInput
-        style={styles.input}
-        placeholder="Нууц үг баталгаажуулах"
-        value={confirmPassword}
-        onChangeText={setConfirmPassword}
-        secureTextEntry
-      />
-      <Button title="Бүртгүүлэх" onPress={handleRegister} />
+      <form onSubmit={handleSubmit(onSubmit)}>
+        <Controller
+          control={control}
+          render={({ field: { onChange, onBlur, value } }) => (
+            <TextInput
+              style={styles.input}
+              placeholder="Хэрэглэгчийн нэр"
+              onBlur={onBlur}
+              onChangeText={onChange}
+              value={value}
+            />
+          )}
+          name="firstname"
+          defaultValue=""
+        />
+        <Controller
+          control={control}
+          render={({ field: { onChange, onBlur, value } }) => (
+            <TextInput
+              style={styles.input}
+              placeholder="lastname"
+              onBlur={onBlur}
+              onChangeText={onChange}
+              value={value}
+            />
+          )}
+          name="lastname"
+          defaultValue=""
+        />
+        <Controller
+          control={control}
+          render={({ field: { onChange, onBlur, value } }) => (
+            <TextInput
+              style={styles.input}
+              placeholder="username"
+              onBlur={onBlur}
+              onChangeText={onChange}
+              value={value}
+            />
+          )}
+          name="username"
+          defaultValue=""
+        />
+        <Controller
+          control={control}
+          render={({ field: { onChange, onBlur, value } }) => (
+            <TextInput
+              style={styles.input}
+              placeholder="email"
+              onBlur={onBlur}
+              onChangeText={onChange}
+              value={value}
+            />
+          )}
+          name="email"
+        />
+        <Controller
+          control={control}
+          render={({ field: { onChange, onBlur, number } }) => (
+            <TextInput
+              style={styles.input}
+              placeholder="phonenumber"
+              onBlur={onBlur}
+              onChangeText={onChange}
+              value={number}
+              keyboardType="numeric"
+            />
+          )}
+          name="phonenumber"
+        />
+        <Controller
+          control={control}
+          render={({ field: { onChange, onBlur, value } }) => (
+            <TextInput
+              style={styles.input}
+              placeholder="password"
+              onBlur={onBlur}
+              onChangeText={onChange}
+              value={value}
+              textContentType="password"
+              secureTextEntry
+            />
+          )}
+          name="password"
+        />
+        <Controller
+          control={control}
+          render={({ field: { onChange, onBlur, number } }) => (
+            <TextInput
+              style={styles.input}
+              placeholder="usertypeid"
+              onBlur={onBlur}
+              onChangeText={onChange}
+              value={number}
+              keyboardType="numeric"
+            />
+          )}
+          name="usertypeid"
+        />
+
+        <Button title="Бүртгүүлэх" onPress={handleSubmit(onSubmit)} />
+      </form>
     </View>
   );
 };
-
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
+    justifyContent: "center",
+    alignItems: "center",
     paddingHorizontal: 20,
   },
   title: {
@@ -90,14 +144,13 @@ const styles = StyleSheet.create({
     marginBottom: 20,
   },
   input: {
-    width: '100%',
+    width: "100%",
     height: 40,
-    borderColor: 'gray',
+    borderColor: "gray",
     borderWidth: 1,
     borderRadius: 5,
     paddingHorizontal: 10,
     marginBottom: 10,
   },
 });
-
 export default RegisterScreen;

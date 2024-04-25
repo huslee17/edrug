@@ -1,12 +1,13 @@
-import React from 'react';
-import { NavigationContainer } from '@react-navigation/native';
-import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
-import { createStackNavigator } from '@react-navigation/stack';
-import { createDrawerNavigator } from '@react-navigation/drawer';
-import LoginScreen from './screen/login';
-import HomeScreen from './screen/home';
-import RegisterScreen from './screen/register';
-import DrawerContentScreen from './screen/DrawerContent';
+import React from "react";
+import { NavigationContainer } from "@react-navigation/native";
+import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
+import { createStackNavigator } from "@react-navigation/stack";
+import { createDrawerNavigator } from "@react-navigation/drawer";
+import LoginScreen from "./screen/login";
+import HomeScreen from "./screen/home";
+import RegisterScreen from "./screen/register";
+import DrawerContentScreen from "./screen/DrawerContent";
+import UserInfoScreen from "./screen/Userinfo";
 
 const Stack = createStackNavigator();
 const Tab = createBottomTabNavigator();
@@ -15,21 +16,26 @@ function TabNavigator() {
   return (
     <Tab.Navigator
       screenOptions={{
-        headerShown: false
+        headerShown: false,
       }}
-    > 
+    >
       <Tab.Screen name="Home" component={HomeScreen} />
       <Tab.Screen name="Register" component={RegisterScreen} />
       <Tab.Screen name="Login" component={LoginScreen} />
+      <Tab.Screen name="UserInfoScreen" component={UserInfoScreen} />
     </Tab.Navigator>
   );
 }
 
 function App() {
   return (
-    <NavigationContainer >
+    <NavigationContainer>
       <Drawer.Navigator drawerContent={() => <DrawerContentScreen />}>
-        <Drawer.Screen name="Home" component={TabNavigator} options={{headerLeft: () => null,}}/>
+        <Drawer.Screen
+          name="Home"
+          component={TabNavigator}
+          options={{ headerLeft: () => null }}
+        />
       </Drawer.Navigator>
     </NavigationContainer>
   );
