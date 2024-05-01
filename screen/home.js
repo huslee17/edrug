@@ -1,3 +1,5 @@
+"use client";
+
 import React, { useState, useEffect } from "react";
 import {
   View,
@@ -11,11 +13,15 @@ import {
   Button,
   Modal,
   Platform,
+  FlatList,
+  StatusBar,
 } from "react-native";
 import { Searchbar } from "react-native-paper";
-import { useRoute } from "@react-navigation/native";
-import { useNavigation, DrawerActions } from "@react-navigation/native";
+import { useNavigation } from "@react-navigation/native";
+import { useQuery } from "@tanstack/react-query";
 import { FontAwesome } from "@expo/vector-icons";
+import { druglist } from "../action";
+import IsLoadingComponent from "./components/isloading";
 
 const HomeScreen = () => {
   const navigation = useNavigation();
@@ -23,29 +29,21 @@ const HomeScreen = () => {
   const [modalVisible, setModalVisible] = useState(false);
   const [task, setTask] = useState("");
   const [selectedImage, setSelectedImage] = useState([]);
-
-  useEffect(() => {
-    const checkLoginStatus = async () => {
-      try {
-        const loggedIn = await AsyncStorage.getItem("loggedIn");
-        if (loggedIn === "true") {
-          navigation.navigate("Main", { screen: "Home" });
-        }
-      } catch (error) {
-        console.error("Error checking login status:", error);
-      }
-    };
-
-    checkLoginStatus();
-  }, []);
+  const [datalist, setdatalist] = useState();
   const profile = () => {
     navigation.navigate("Login");
   };
-
+  const { data, isPending } = useQuery({
+    queryKey: ["druglist"],
+    queryFn: () => druglist(),
+  });
+  console.log(datalist);
+  useEffect(() => {
+    if (data) setdatalist(data?.data?.data);
+  });
   const handlePickImage = () => {
     // Implement image picking logic here
   };
-
   const handleDeleteImage = (index) => {
     const updatedImages = [...selectedImage];
     updatedImages.splice(index, 1);
@@ -58,12 +56,6 @@ const HomeScreen = () => {
 
   return (
     <View style={styles.container}>
-      <TouchableOpacity
-        style={styles.menuButton}
-        onPress={() => navigation.dispatch(DrawerActions.openDrawer())}
-      >
-        <Text style={styles.menuText}>☰</Text>
-      </TouchableOpacity>
       <ScrollView contentContainerStyle={styles.scrollViewContent}>
         <Text style={styles.title}>Welcome to My App</Text>
         <Text style={styles.subtitle}>Explore and enjoy!</Text>
@@ -81,33 +73,21 @@ const HomeScreen = () => {
             />
             <Text>Home</Text>
           </TouchableOpacity>
-
-          <TouchableOpacity style={styles.button}>
-            <Image
-              source={require("./img/drugs.png")}
-              style={styles.buttonImage}
-            />
-            <Text>Settings</Text>
-          </TouchableOpacity>
-
-          <TouchableOpacity style={styles.button}>
-            <Image
-              source={require("./img/drugs.png")}
-              style={styles.buttonImage}
-            />
-            <Text>Notifications</Text>
-          </TouchableOpacity>
-
-          <TouchableOpacity style={styles.button} onPress={profile}>
-            <Image
-              source={require("./img/drugs.png")}
-              style={styles.buttonImage}
-            />
-            <Text>Profile</Text>
-          </TouchableOpacity>
         </View>
+        <IsLoadingComponent isLoading={isPending} />
       </ScrollView>
 
+      <ScrollView style={styles.ListData}>
+        <FlatList
+          data={datalist}
+          renderItem={({ item }) => (
+            <View style={styles.item}>
+              <Text>{item.international_name}</Text>
+            </View>
+          )}
+          keyExtractor={(item) => item.drug_id.toString()}
+        />
+      </ScrollView>
       <KeyboardAvoidingView
         behavior={Platform.OS === "ios" ? "padding" : null}
         style={styles.keyboardAvoidingView}
@@ -164,8 +144,18 @@ const HomeScreen = () => {
 };
 
 const styles = StyleSheet.create({
+  ListData: {
+    flex: 1,
+    marginTop: StatusBar.currentHeight || 0,
+  },
   container: {
     flex: 1,
+  },
+  item: {
+    backgroundColor: "#f9c2ff",
+    padding: 20,
+    marginVertical: 8,
+    marginHorizontal: 16,
   },
   scrollViewContent: {
     flexGrow: 1,

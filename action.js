@@ -34,7 +34,23 @@ export const register = async ({
   });
 };
 
-export async function DrugListData() {
-  const response = instance.get();
+export async function userdrug() {
+  const response = instance.get(`/drugid/${1}`);
   return response;
 }
+export async function druglist() {
+  const response = instance.get("/druglist");
+  return response;
+}
+// export async function DrugListData() {
+//   const response = instance.post();
+//   return response;
+// }
+// export async function DrugListData() {
+//   const response = instance.delete();
+//   return response;
+// }
+// export async function DrugListData() {
+//   const response = instance.put();
+//   return response;
+// }

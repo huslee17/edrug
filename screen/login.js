@@ -1,15 +1,28 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { View, Text, TextInput, Pressable, StyleSheet } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import { login } from "../action";
-import { useRoute } from "@react-navigation/native";
 
 const LoginScreen = () => {
   const navigation = useNavigation();
   const [phonenumber, setPhonenumber] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
-  const route = useRoute();
+
+  useEffect(() => {
+    checkLoggedIn();
+  }, []);
+
+  const checkLoggedIn = async () => {
+    try {
+      const loggedIn = await localStorage.getItem("loggedIn");
+      if (loggedIn === "true") {
+        navigation.navigate("Main", { screen: "Home" });
+      }
+    } catch (error) {
+      console.error("Error checking login status:", error);
+    }
+  };
 
   const handleLogin = async () => {
     try {
@@ -18,9 +31,11 @@ const LoginScreen = () => {
         password: password,
       });
       if (response.status === 200) {
-        const userData = response.data.data;
-        await AsyncStorage.setItem("loggedIn", "true");
-        navigation.navigate("Home", { user: userData });
+        const userdata = response?.data?.data?.[0];
+        await localStorage.setItem("userId", userdata.userid.toString());
+        await localStorage.setItem("UserData", JSON.stringify(userdata));
+        await localStorage.setItem("loggedIn", "true");
+        navigation.navigate("Main", { screen: "Home" });
       }
     } catch (error) {
       console.error("Login error:", error);
@@ -90,6 +105,7 @@ const styles = StyleSheet.create({
     paddingVertical: 10,
     paddingHorizontal: 20,
     borderRadius: 5,
+    marginTop: 10,
   },
   buttonText: {
     color: "#fff",
