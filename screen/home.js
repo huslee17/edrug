@@ -73,6 +73,27 @@ const HomeScreen = () => {
             />
             <Text>Home</Text>
           </TouchableOpacity>
+          <TouchableOpacity style={styles.button}>
+            <Image
+              source={require("./img/home.png")}
+              style={styles.buttonImage}
+            />
+            <Text>News</Text>
+          </TouchableOpacity>
+          <TouchableOpacity style={styles.button}>
+            <Image
+              source={require("./img/news.jpg")}
+              style={styles.buttonImage}
+            />
+            <Text>Drugs</Text>
+          </TouchableOpacity>
+          <TouchableOpacity style={styles.button}>
+            <Image
+              source={require("./img/sale.png")}
+              style={styles.buttonImage}
+            />
+            <Text>Sale</Text>
+          </TouchableOpacity>
         </View>
         <IsLoadingComponent isLoading={isPending} />
       </ScrollView>
