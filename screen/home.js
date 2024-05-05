@@ -15,6 +15,7 @@ import {
   Platform,
   FlatList,
   StatusBar,
+  SafeAreaView,
 } from "react-native";
 import { Searchbar } from "react-native-paper";
 import { useNavigation } from "@react-navigation/native";
@@ -22,6 +23,7 @@ import { useQuery } from "@tanstack/react-query";
 import { FontAwesome } from "@expo/vector-icons";
 import { druglist } from "../action";
 import IsLoadingComponent from "./components/isloading";
+import { Searcname } from "../action";
 
 const HomeScreen = () => {
   const navigation = useNavigation();
@@ -30,136 +32,186 @@ const HomeScreen = () => {
   const [task, setTask] = useState("");
   const [selectedImage, setSelectedImage] = useState([]);
   const [datalist, setdatalist] = useState();
-  const profile = () => {
-    navigation.navigate("Login");
-  };
-  const { data, isPending } = useQuery({
+  const [selectedId, setSelectedId] = useState();
+  const [searchResult, setsearchResult] = useState("");
+
+  const { data } = useQuery({
     queryKey: ["druglist"],
     queryFn: () => druglist(),
   });
-  console.log(datalist);
+
+  const { data: searchData, isPending } = useQuery({
+    queryKey: ["Searcname", searchQuery],
+    queryFn: () => Searcname(searchQuery),
+  });
+
   useEffect(() => {
     if (data) setdatalist(data?.data?.data);
   });
-  const handlePickImage = () => {
-    // Implement image picking logic here
-  };
+  useEffect(() => {
+    if (searchData) setsearchResult(searchData);
+  });
+
+  const handlePickImage = () => {};
   const handleDeleteImage = (index) => {
     const updatedImages = [...selectedImage];
     updatedImages.splice(index, 1);
     setSelectedImage(updatedImages);
   };
+  const handleSubmitModal = () => {};
 
-  const handleSubmitModal = () => {
-    // Implement submission logic here
+  const renderItem = ({ item }) => {
+    const backgroundColor = item.drug_id === selectedId ? "#6e3b6e" : "#f9c2ff";
+    const color = item.id === selectedId ? "white" : "black";
+    return (
+      <TouchableOpacity
+        onPress={() => setSelectedId(item.drug_id)}
+        style={[styles.item, { backgroundColor }]}
+      >
+        <Text style={[styles.itemText, { color }]}>
+          {item.international_name}
+        </Text>
+      </TouchableOpacity>
+    );
   };
-
+  const handleSearchResultClick = (drugId) => {
+    navigation.navigate("DrugDetailScreen", { id: drugId });
+  };
   return (
     <View style={styles.container}>
-      <ScrollView contentContainerStyle={styles.scrollViewContent}>
-        <Text style={styles.title}>Welcome to My App</Text>
-        <Text style={styles.subtitle}>Explore and enjoy!</Text>
-        <Searchbar
-          placeholder="Search"
-          onChangeText={setSearchQuery}
-          value={searchQuery}
-          style={styles.searchBar}
-        />
-        <View style={styles.buttonContainer}>
-          <TouchableOpacity style={styles.button}>
-            <Image
-              source={require("./img/drugs.png")}
-              style={styles.buttonImage}
-            />
-            <Text>Home</Text>
-          </TouchableOpacity>
-          <TouchableOpacity style={styles.button}>
-            <Image
-              source={require("./img/home.png")}
-              style={styles.buttonImage}
-            />
-            <Text>News</Text>
-          </TouchableOpacity>
-          <TouchableOpacity style={styles.button}>
-            <Image
-              source={require("./img/news.jpg")}
-              style={styles.buttonImage}
-            />
-            <Text>Drugs</Text>
-          </TouchableOpacity>
-          <TouchableOpacity style={styles.button}>
-            <Image
-              source={require("./img/sale.png")}
-              style={styles.buttonImage}
-            />
-            <Text>Sale</Text>
-          </TouchableOpacity>
+      <View style={styles.scrollViewContent}>
+        <View style={styles.header}>
+          <Image style={styles.logo} source={require("../assets/Logo.png")} />
+          <Text style={styles.logoname}> Edrug</Text>
         </View>
-        <IsLoadingComponent isLoading={isPending} />
-      </ScrollView>
-
-      <ScrollView style={styles.ListData}>
-        <FlatList
-          data={datalist}
-          renderItem={({ item }) => (
-            <View style={styles.item}>
-              <Text>{item.international_name}</Text>
-            </View>
-          )}
-          keyExtractor={(item) => item.drug_id.toString()}
-        />
-      </ScrollView>
-      <KeyboardAvoidingView
-        behavior={Platform.OS === "ios" ? "padding" : null}
-        style={styles.keyboardAvoidingView}
-      >
-        <TouchableOpacity
-          onPress={() => setModalVisible(true)}
-          style={styles.addButton}
-        >
-          <Text style={styles.addText}>+</Text>
-        </TouchableOpacity>
-      </KeyboardAvoidingView>
-      <Modal
-        animationType="slide"
-        transparent={true}
-        visible={modalVisible}
-        onRequestClose={() => setModalVisible(false)}
-      >
-        <View style={styles.modalContainer}>
-          <View style={styles.modalContent}>
-            <TextInput
-              style={styles.modalInput}
-              placeholder="Write a task"
-              value={task}
-              onChangeText={(text) => setTask(text)}
-            />
-            <TouchableOpacity onPress={handlePickImage}>
-              <View style={styles.modalButton}>
-                <FontAwesome name="image" size={24} color="black" />
+        <View style={styles.searchContainer}>
+          <Searchbar
+            placeholder="Search"
+            onChangeText={setSearchQuery}
+            value={searchQuery}
+            style={styles.searchBar}
+            onClear={() => {
+              setSearchQuery("");
+              navigation.navigate("Main", { screen: "userDrug" });
+            }}
+          />
+        </View>
+        {searchResult.data && searchResult.data.length > 0 ? (
+          searchResult.data.map((item, index) => (
+            <TouchableOpacity
+              key={index}
+              style={styles.searchResultCard}
+              onPress={() => handleSearchResultClick(item.drug_id)}
+            >
+              <View style={styles.textContainer}>
+                <Text style={styles.itemText}>{item.international_name}</Text>
               </View>
             </TouchableOpacity>
-            <View style={styles.imageContainer}>
-              {selectedImage.map((image, idx) => (
-                <View key={idx} style={styles.uploadedImageContainer}>
-                  <Image
-                    source={{ uri: image.uri }}
-                    style={styles.uploadedImage}
-                  />
-                  <TouchableOpacity onPress={() => handleDeleteImage(idx)}>
-                    <FontAwesome name="trash" size={24} color="red" />
-                  </TouchableOpacity>
-                </View>
-              ))}
+          ))
+        ) : searchQuery !== "" ? (
+          <View>
+            <Text>Хайлтын үр дүн олдсонгүй</Text>
+          </View>
+        ) : null}
+      </View>
+      {isPending === true ? (
+        <IsLoadingComponent style={styles.loading} isLoading={isPending} />
+      ) : null}
+
+      {searchResult && searchResult?.resultCode === 400 ? (
+        <View style={styles.container}>
+          <ScrollView
+            contentContainerStyle={styles.scrollViewCategroy}
+            horizontal={true}
+            showsHorizontalScrollIndicator={false}
+            showsVerticalScrollIndicator={false}
+          >
+            <View style={styles.buttonContainer}>
+              <TouchableOpacity style={styles.Categorybutton}>
+                <Text style={styles.CategorybuttonText}>Антибиотик</Text>
+              </TouchableOpacity>
+              <TouchableOpacity style={styles.Categorybutton}>
+                <Text style={styles.CategorybuttonText}>Өвчин намдаагч</Text>
+              </TouchableOpacity>
+              <TouchableOpacity style={styles.Categorybutton}>
+                <Text style={styles.CategorybuttonText}>Ханиад</Text>
+              </TouchableOpacity>
+              <TouchableOpacity style={styles.Categorybutton}>
+                <Text style={styles.CategorybuttonText}>Ханиад</Text>
+              </TouchableOpacity>
+              <TouchableOpacity style={styles.Categorybutton}>
+                <Text style={styles.CategorybuttonText}>Өвчин намдаагч</Text>
+              </TouchableOpacity>
             </View>
-            <Button
-              style={styles.modalButtonSub}
-              title="Submit"
-              onPress={handleSubmitModal}
+          </ScrollView>
+          <View style={styles.container}>
+            <Image
+              source={require("../assets/banner.jpg")}
+              style={styles.banner}
             />
           </View>
+          <SafeAreaView style={styles.ListData}>
+            <FlatList
+              data={datalist}
+              renderItem={renderItem}
+              extraData={selectedId}
+              keyExtractor={(item) => item.drug_id.toString()}
+            />
+          </SafeAreaView>
+
+          <KeyboardAvoidingView
+            behavior={Platform.OS === "ios" ? "padding" : null}
+            style={styles.keyboardAvoidingView}
+          >
+            <TouchableOpacity
+              onPress={() => setModalVisible(true)}
+              style={styles.addButton}
+            >
+              <Text style={styles.addText}>+</Text>
+            </TouchableOpacity>
+          </KeyboardAvoidingView>
+          <Modal
+            animationType="slide"
+            transparent={true}
+            visible={modalVisible}
+            onRequestClose={() => setModalVisible(false)}
+          >
+            <View style={styles.modalContainer}>
+              <View style={styles.modalContent}>
+                <TextInput
+                  style={styles.modalInput}
+                  placeholder="Write a task"
+                  value={task}
+                  onChangeText={(text) => setTask(text)}
+                />
+                <TouchableOpacity onPress={handlePickImage}>
+                  <View style={styles.modalButton}>
+                    <FontAwesome name="image" size={24} color="black" />
+                  </View>
+                </TouchableOpacity>
+                <View style={styles.imageContainer}>
+                  {selectedImage.map((image, idx) => (
+                    <View key={idx} style={styles.uploadedImageContainer}>
+                      <Image
+                        source={{ uri: image.uri }}
+                        style={styles.uploadedImage}
+                      />
+                      <TouchableOpacity onPress={() => handleDeleteImage(idx)}>
+                        <FontAwesome name="trash" size={24} color="red" />
+                      </TouchableOpacity>
+                    </View>
+                  ))}
+                </View>
+                <Button
+                  style={styles.modalButtonSub}
+                  title="Submit"
+                  onPress={handleSubmitModal}
+                />
+              </View>
+            </View>
+          </Modal>
         </View>
-      </Modal>
+      ) : null}
     </View>
   );
 };
@@ -170,7 +222,9 @@ const styles = StyleSheet.create({
     marginTop: StatusBar.currentHeight || 0,
   },
   container: {
-    flex: 1,
+    flexDirection: "column",
+    flex: 3,
+    marginTop: 10,
   },
   item: {
     backgroundColor: "#f9c2ff",
@@ -179,13 +233,12 @@ const styles = StyleSheet.create({
     marginHorizontal: 16,
   },
   scrollViewContent: {
-    flexGrow: 1,
-    paddingBottom: 20,
+    flex: 1,
     alignItems: "center",
   },
   searchBar: {
+    backgroundColor: "f0f0f0",
     width: "100%",
-    marginBottom: 20,
   },
   modalContainer: {
     flex: 1,
@@ -208,7 +261,6 @@ const styles = StyleSheet.create({
   },
   modalButtonSub: {
     width: 10,
-
     marginBottom: 10,
     backgroundColor: "#2c69d3",
     padding: 10,
@@ -237,16 +289,36 @@ const styles = StyleSheet.create({
   buttonContainer: {
     flexDirection: "row",
     justifyContent: "space-around",
-    width: "90%",
+    width: "auto",
   },
-  button: {
+  searchContainer: {
+    flexDirection: "row",
+    justifyContent: "space-around",
+    backgroundColor: "#f0f0f0",
+    width: "90%",
+    borderWidth: 1,
+    borderColor: "#ccc",
+    borderRadius: 20,
+    height: 50,
+    marginBottom: 20,
+  },
+
+  CategorybuttonText: {
+    paddingLeft: 4,
+    paddingRight: 4,
+    fontSize: 18,
+    color: "#FFF",
+  },
+  Categorybutton: {
+    marginRight: 10,
+    color: "fff",
+    width: "auto",
+    height: 30,
+    backgroundColor: "#007BFF",
+    borderRadius: 20,
     alignItems: "center",
   },
-  buttonImage: {
-    width: 50,
-    height: 50,
-    marginBottom: 10,
-  },
+
   menuButton: {
     position: "absolute",
     top: 20,
@@ -273,6 +345,60 @@ const styles = StyleSheet.create({
   addText: {
     color: "#fff",
     fontSize: 24,
+  },
+  banner: {
+    height: "100%",
+    alignSelf: "center",
+    width: 300,
+    marginLeft: 10,
+    marginRight: 10,
+    borderRadius: 10,
+  },
+  header: {
+    flexDirection: "row",
+    marginBottom: 10,
+  },
+  logo: {
+    width: 50,
+    height: 50,
+    resizeMode: "contain",
+  },
+  logoname: {
+    fontSize: 24,
+    fontWeight: "bold",
+    color: "#007BFF",
+    marginLeft: 10,
+    alignSelf: "center",
+  },
+  loading: {
+    position: "absolute",
+  },
+  scrollViewCategroy: {
+    paddingHorizontal: 10,
+  },
+  searchResultContainer: {
+    paddingHorizontal: 10,
+  },
+  searchResultCard: {
+    flexDirection: "row",
+    alignItems: "center",
+    backgroundColor: "#fff",
+    borderRadius: 10,
+    marginBottom: 10,
+    elevation: 2,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.2,
+    shadowRadius: 2,
+  },
+  textContainer: {
+    flex: 1,
+    paddingHorizontal: 10,
+  },
+  itemText: {
+    fontSize: 16,
+    fontWeight: "bold",
+    color: "#333",
   },
 });
 

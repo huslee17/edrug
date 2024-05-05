@@ -1,7 +1,12 @@
 import React from "react";
+import { View, Text } from "react-native";
 
 const UserDrugScreen = () => {
-  return <div>aa</div>;
+  return (
+    <View>
+      <Text>UserDrugScreen</Text>
+    </View>
+  );
 };
 
 export default UserDrugScreen;

@@ -1,6 +1,10 @@
 import React, { useState, useEffect } from "react";
-import { View, Text, TextInput, Pressable, StyleSheet } from "react-native";
+
 import { useNavigation } from "@react-navigation/native";
+import ToastManager, { Toast } from "toastify-react-native";
+import LottieView from "lottie-react-native";
+import { View, Text, TextInput, Pressable, StyleSheet } from "react-native";
+
 import { login } from "../action";
 
 const LoginScreen = () => {
@@ -35,10 +39,17 @@ const LoginScreen = () => {
         await localStorage.setItem("userId", userdata.userid.toString());
         await localStorage.setItem("UserData", JSON.stringify(userdata));
         await localStorage.setItem("loggedIn", "true");
-        navigation.navigate("Main", { screen: "Home" });
+        setTimeout(() => {
+          setLoading(false);
+          Toast.success("Амжилттай нэвтэрлээ");
+          navigation.navigate("Main", { screen: "Home" });
+        }, 2000);
       }
     } catch (error) {
-      console.error("Login error:", error);
+      Toast.show({
+        type: "error",
+        text1: "Login failed. Please try again.",
+      });
     }
   };
 
@@ -48,40 +59,49 @@ const LoginScreen = () => {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Нэвтрэх</Text>
-      <View style={styles.inputContainer}>
-        <TextInput
-          style={styles.input}
-          placeholder="Имайл оруулах"
-          value={phonenumber}
-          onChangeText={setPhonenumber}
+      <View style={styles.form}>
+        <LottieView
+          autoPlay
+          loop
+          source={require("../assets/animation.json")}
         />
-        <TextInput
-          style={styles.input}
-          placeholder="Password"
-          value={password}
-          onChangeText={setPassword}
-          secureTextEntry
-        />
+        <Text style={styles.title}>Нэвтрэх</Text>
+        <View style={styles.inputContainer}>
+          <TextInput
+            style={styles.input}
+            placeholder="Имайл оруулах"
+            value={phonenumber}
+            onChangeText={setPhonenumber}
+            keyboardType="email-address"
+          />
+          <TextInput
+            style={styles.input}
+            placeholder="Password"
+            value={password}
+            onChangeText={setPassword}
+            secureTextEntry
+          />
+        </View>
       </View>
       <Pressable style={styles.button} onPress={handleLogin}>
         <Text style={styles.buttonText}>Нэвтрэх</Text>
       </Pressable>
-      <Text onPress={register}>Нууц үгээ мартсан уу?</Text>
-      <Text>Бүртгэл үүсгэх үү?</Text>
-      <Pressable style={styles.button} onPress={register}>
-        <Text style={styles.buttonText}>Бүртгүүлэх</Text>
+      <Pressable onPress={register}>
+        <Text style={styles.link}>Бүртгэл үүсгэх үү?</Text>
       </Pressable>
     </View>
   );
 };
+//
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
     justifyContent: "center",
-    alignItems: "center",
     paddingHorizontal: 20,
+  },
+  form: {
+    alignItems: "center",
   },
   title: {
     fontSize: 24,
@@ -94,7 +114,7 @@ const styles = StyleSheet.create({
   input: {
     width: "100%",
     height: 40,
-    borderColor: "gray",
+    borderColor: "#ccc",
     borderWidth: 1,
     borderRadius: 5,
     paddingHorizontal: 10,
@@ -110,6 +130,11 @@ const styles = StyleSheet.create({
   buttonText: {
     color: "#fff",
     fontSize: 18,
+    textAlign: "center",
+  },
+  link: {
+    color: "#007BFF",
+    marginTop: 10,
   },
 });
 

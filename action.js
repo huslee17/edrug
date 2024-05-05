@@ -34,14 +34,23 @@ export const register = async ({
   });
 };
 
-export async function userdrug() {
-  const response = instance.get(`/drugid/${1}`);
-  return response;
-}
+// Em list
 export async function druglist() {
   const response = instance.get("/druglist");
   return response;
 }
+
+// Detail
+export async function Getdrugid(id) {
+  try {
+    const response = await instance.get(`/drugid/${id}`);
+    return response.data;
+  } catch (error) {
+    console.log("Error getting drug details:", error);
+    return null;
+  }
+}
+
 // export async function DrugListData() {
 //   const response = instance.post();
 //   return response;
@@ -54,3 +63,9 @@ export async function druglist() {
 //   const response = instance.put();
 //   return response;
 // }
+export async function Searcname(searchQuery) {
+  const response = await instance.post("/searchDrugs", {
+    drugname: searchQuery.toLowerCase(),
+  });
+  return response.data;
+}
