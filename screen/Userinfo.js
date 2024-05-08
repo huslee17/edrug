@@ -1,17 +1,11 @@
-import React from "react";
-import {
-  View,
-  Text,
-  Button,
-  StyleSheet,
-  TouchableOpacity,
-  Image,
-} from "react-native";
+import React, { useEffect, useState } from "react";
+import { View, Text, TouchableOpacity, Image, StyleSheet } from "react-native";
 
 export default function UserInfoScreen({ navigation }) {
+  const [loginnedUserdata, setLoginnedUserdata] = useState(null);
+
   const handleLogout = async () => {
     try {
-      await localStorage.removeItem("userId");
       await localStorage.removeItem("UserData");
       await localStorage.removeItem("loggedIn");
       navigation.navigate("Login");
@@ -20,34 +14,44 @@ export default function UserInfoScreen({ navigation }) {
     }
   };
 
+  useEffect(() => {
+    const fetchUserData = async () => {
+      try {
+        const userData = await localStorage.getItem("UserData");
+        if (userData) {
+          setLoginnedUserdata(JSON.parse(userData));
+        }
+      } catch (error) {
+        console.error("Error fetching user data:", error);
+      }
+    };
+    fetchUserData();
+  }, []);
+
   return (
-    <View>
-      <View style={styles.container}>
-        <View style={styles.header}>
-          <Image
-            source={require("../assets/userprofile.jpg")}
-            style={styles.avatar}
-          />
-          <Text style={styles.headerText}>Welcome, Будхүү!</Text>
-        </View>
-        <View style={styles.content}>
-          <Text style={styles.userInfo}>Username: Будхүү</Text>
-          <Text style={styles.userInfo}>Email: budhuu@gmail.com</Text>
-          <TouchableOpacity style={styles.editButton}>
-            <Text style={styles.editButtonText}>Edit Profile</Text>
-          </TouchableOpacity>
-        </View>
-        <View style={styles.footer}>
-          <TouchableOpacity style={styles.logoutButton} onPress={handleLogout}>
-            <Text
-              style={styles.logoutButtonText}
-              title="LogOut"
-              onPress={handleLogout}
-            >
-              Log Out
-            </Text>
-          </TouchableOpacity>
-        </View>
+    <View style={styles.container}>
+      <View style={styles.header}>
+        <Image
+          source={require("../assets/userprofile.jpg")}
+          style={styles.avatar}
+        />
+        <Text style={styles.headerText}>
+          Welcome, {loginnedUserdata?.username || "Guest"}!
+        </Text>
+      </View>
+      <View style={styles.content}>
+        <Text style={styles.userInfo}>
+          Username: {loginnedUserdata?.username}
+        </Text>
+        <Text style={styles.userInfo}>Email: {loginnedUserdata?.email}</Text>
+        <TouchableOpacity style={styles.editButton}>
+          <Text style={styles.editButtonText}>Edit Profile</Text>
+        </TouchableOpacity>
+      </View>
+      <View style={styles.footer}>
+        <TouchableOpacity style={styles.logoutButton} onPress={handleLogout}>
+          <Text style={styles.logoutButtonText}>Log Out</Text>
+        </TouchableOpacity>
       </View>
     </View>
   );

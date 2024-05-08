@@ -21,9 +21,9 @@ import { Searchbar } from "react-native-paper";
 import { useNavigation } from "@react-navigation/native";
 import { useQuery } from "@tanstack/react-query";
 import { FontAwesome } from "@expo/vector-icons";
-import { druglist } from "../action";
 import IsLoadingComponent from "./components/isloading";
-import { Searcname } from "../action";
+import { Searcname, Categorylist, druglist, newsdatalist } from "../action";
+import CardComponent from "./components/card";
 
 const HomeScreen = () => {
   const navigation = useNavigation();
@@ -39,12 +39,17 @@ const HomeScreen = () => {
     queryKey: ["druglist"],
     queryFn: () => druglist(),
   });
+  const { data: newsdata } = useQuery({
+    queryKey: ["newsdatalist"],
+    queryFn: () => newsdatalist(),
+  });
 
   const { data: searchData, isPending } = useQuery({
     queryKey: ["Searcname", searchQuery],
     queryFn: () => Searcname(searchQuery),
   });
 
+  console.log(newsdata);
   useEffect(() => {
     if (data) setdatalist(data?.data?.data);
   });
@@ -61,11 +66,11 @@ const HomeScreen = () => {
   const handleSubmitModal = () => {};
 
   const renderItem = ({ item }) => {
-    const backgroundColor = item.drug_id === selectedId ? "#6e3b6e" : "#f9c2ff";
+    const backgroundColor = item.id === selectedId ? "#6e3b6e" : "#f9c2ff";
     const color = item.id === selectedId ? "white" : "black";
     return (
       <TouchableOpacity
-        onPress={() => setSelectedId(item.drug_id)}
+        onPress={() => setSelectedId(item.id)}
         style={[styles.item, { backgroundColor }]}
       >
         <Text style={[styles.itemText, { color }]}>
@@ -74,10 +79,15 @@ const HomeScreen = () => {
       </TouchableOpacity>
     );
   };
-  const handleSearchResultClick = (drugId) => {
-    navigation.navigate("DrugDetailScreen", { id: drugId });
+
+  const url = [
+    "https://cdn.greensoft.mn/uploads/users/1977/images/Meic/Zurag_2-sml.jpg",
+    "https://picsum.photos/702",
+  ];
+  const handleSearchResultClick = (id) => {
+    navigation.navigate("DrugDetailScreen", { props: id });
   };
-  // esda
+
   return (
     <View style={styles.container}>
       <View style={styles.scrollViewContent}>
@@ -102,7 +112,7 @@ const HomeScreen = () => {
             <TouchableOpacity
               key={index}
               style={styles.searchResultCard}
-              onPress={() => handleSearchResultClick(item.drug_id)}
+              onPress={() => handleSearchResultClick(item.id)}
             >
               <View style={styles.textContainer}>
                 <Text style={styles.itemText}>{item.international_name}</Text>
@@ -118,100 +128,28 @@ const HomeScreen = () => {
       {isPending === true ? (
         <IsLoadingComponent style={styles.loading} isLoading={isPending} />
       ) : null}
-
       {searchResult && searchResult?.resultCode === 400 ? (
-        <View style={styles.container}>
+        <>
           <ScrollView
             contentContainerStyle={styles.scrollViewCategroy}
+            showsVerticalScrollIndicator
             horizontal={true}
-            showsHorizontalScrollIndicator={false}
-            showsVerticalScrollIndicator={false}
           >
-            <View style={styles.buttonContainer}>
-              <TouchableOpacity style={styles.Categorybutton}>
-                <Text style={styles.CategorybuttonText}>Антибиотик</Text>
-              </TouchableOpacity>
-              <TouchableOpacity style={styles.Categorybutton}>
-                <Text style={styles.CategorybuttonText}>Өвчин намдаагч</Text>
-              </TouchableOpacity>
-              <TouchableOpacity style={styles.Categorybutton}>
-                <Text style={styles.CategorybuttonText}>Ханиад</Text>
-              </TouchableOpacity>
-              <TouchableOpacity style={styles.Categorybutton}>
-                <Text style={styles.CategorybuttonText}>Ханиад</Text>
-              </TouchableOpacity>
-              <TouchableOpacity style={styles.Categorybutton}>
-                <Text style={styles.CategorybuttonText}>Өвчин намдаагч</Text>
-              </TouchableOpacity>
-            </View>
-          </ScrollView>
-          <View style={styles.container}>
-            <Image
-              source={require("../assets/banner.jpg")}
-              style={styles.banner}
-            />
-          </View>
-          <SafeAreaView style={styles.ListData}>
-            <FlatList
-              data={datalist}
-              renderItem={renderItem}
-              extraData={selectedId}
-              keyExtractor={(item) => item.drug_id.toString()}
-            />
-          </SafeAreaView>
-
-          <KeyboardAvoidingView
-            behavior={Platform.OS === "ios" ? "padding" : null}
-            style={styles.keyboardAvoidingView}
-          >
-            <TouchableOpacity
-              onPress={() => setModalVisible(true)}
-              style={styles.addButton}
-            >
-              <Text style={styles.addText}>+</Text>
+            <TouchableOpacity style={styles.card}>
+              <CardComponent data={newsdata?.data?.data} url={url} />
             </TouchableOpacity>
-          </KeyboardAvoidingView>
-          <Modal
-            animationType="slide"
-            transparent={true}
-            visible={modalVisible}
-            onRequestClose={() => setModalVisible(false)}
-          >
-            <View style={styles.modalContainer}>
-              <View style={styles.modalContent}>
-                <TextInput
-                  style={styles.modalInput}
-                  placeholder="Write a task"
-                  value={task}
-                  onChangeText={(text) => setTask(text)}
-                />
-                <TouchableOpacity onPress={handlePickImage}>
-                  <View style={styles.modalButton}>
-                    <FontAwesome name="image" size={24} color="black" />
-                  </View>
-                </TouchableOpacity>
-                <View style={styles.imageContainer}>
-                  {selectedImage.map((image, idx) => (
-                    <View key={idx} style={styles.uploadedImageContainer}>
-                      <Image
-                        source={{ uri: image.uri }}
-                        style={styles.uploadedImage}
-                      />
-                      <TouchableOpacity onPress={() => handleDeleteImage(idx)}>
-                        <FontAwesome name="trash" size={24} color="red" />
-                      </TouchableOpacity>
-                    </View>
-                  ))}
-                </View>
-                <Button
-                  style={styles.modalButtonSub}
-                  title="Submit"
-                  onPress={handleSubmitModal}
-                />
-              </View>
-            </View>
-          </Modal>
-        </View>
+          </ScrollView>
+          {/* <View style={styles.container}>
+            <SafeAreaView style={styles.ListData}>
+              <FlatList
+                data={datalist}
+                renderItem={renderItem}
+                extraData={selectedId}
+                keyExtractor={(item) => item.id.toString()}
+              />
+            </SafeAreaView>
+          </View> */}
+        </>
       ) : null}
     </View>
   );
@@ -375,6 +313,7 @@ const styles = StyleSheet.create({
     position: "absolute",
   },
   scrollViewCategroy: {
+    flex: 1,
     paddingHorizontal: 10,
   },
   searchResultContainer: {
@@ -397,9 +336,18 @@ const styles = StyleSheet.create({
     paddingHorizontal: 10,
   },
   itemText: {
-    fontSize: 16,
+    height: 50,
+    width: 400,
+    fontSize: 20,
     fontWeight: "bold",
     color: "#333",
+    textAlign: "center", // Align text horizontally center
+    lineHeight: 50, // Set line height equal to container height for vertical centering
+  },
+
+  card: {
+    marginLeft: 10,
+    marginRight: 10,
   },
 });
 

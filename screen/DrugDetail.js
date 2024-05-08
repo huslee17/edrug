@@ -35,9 +35,8 @@ const DrugDetailScreen = ({ route }) => {
 
   return (
     <View style={styles.container}>
-      <Text>Drug Detail Screen</Text>
       <View>
-        <Text>Drug ID: {detailData?.drug_id}</Text>
+        {/* <Text>Drug ID: {detailData?.drug_id}</Text> */}
         <Text>Trade Name: {detailData?.trade_name}</Text>
         <Text>International Name: {detailData?.international_name}</Text>
         <Text>Swing: {detailData?.swing}</Text>
@@ -56,7 +55,7 @@ const DrugDetailScreen = ({ route }) => {
 };
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
+    flex: 10,
     justifyContent: "center",
     alignItems: "center",
   },
@@ -65,8 +64,8 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
   },
   image: {
-    width: 500,
-    height: 500,
+    width: 1000,
+    height: 1000,
     resizeMode: "contain",
   },
 });

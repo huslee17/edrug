@@ -51,10 +51,14 @@ export async function Getdrugid(id) {
   }
 }
 
-// export async function DrugListData() {
-//   const response = instance.post();
-//   return response;
-// }
+export async function Categorylist() {
+  const response = instance.get("/category");
+  return response;
+}
+export async function newsdatalist() {
+  const response = instance.get("/post");
+  return response;
+}
 // export async function DrugListData() {
 //   const response = instance.delete();
 //   return response;

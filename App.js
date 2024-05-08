@@ -56,12 +56,15 @@ function MainTabs() {
         options={{ headerShown: false }}
         name="Home"
         component={HomeScreen}
+        initialParams={{ id: null }}
       />
       <Tab.Screen
         options={{ headerShown: false }}
         name="userDrug"
         component={UserDrugScreen}
+        initialParams={{ id: null }}
       />
+
       <Tab.Screen name="UserInfo" component={UserInfoScreen} />
     </Tab.Navigator>
   );
