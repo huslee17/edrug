@@ -77,6 +77,7 @@ const HomeScreen = () => {
   const handleSearchResultClick = (drugId) => {
     navigation.navigate("DrugDetailScreen", { id: drugId });
   };
+  // esda
   return (
     <View style={styles.container}>
       <View style={styles.scrollViewContent}>
