@@ -10,7 +10,6 @@ import { Text } from "react-native";
 
 import HomeScreen from "./screen/home";
 import Login from "./screen/login";
-import UserDrugScreen from "./screen/userDrug";
 import RegisterScreen from "./screen/register";
 import UserInfoScreen from "./screen/Userinfo";
 import DrugDetailScreen from "./screen/DrugDetail";
@@ -56,12 +55,6 @@ function MainTabs() {
         options={{ headerShown: false }}
         name="Home"
         component={HomeScreen}
-        initialParams={{ id: null }}
-      />
-      <Tab.Screen
-        options={{ headerShown: false }}
-        name="userDrug"
-        component={UserDrugScreen}
         initialParams={{ id: null }}
       />
 

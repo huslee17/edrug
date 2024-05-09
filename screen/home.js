@@ -49,7 +49,6 @@ const HomeScreen = () => {
     queryFn: () => Searcname(searchQuery),
   });
 
-  console.log(newsdata);
   useEffect(() => {
     if (data) setdatalist(data?.data?.data);
   });
@@ -85,7 +84,7 @@ const HomeScreen = () => {
     "https://picsum.photos/702",
   ];
   const handleSearchResultClick = (id) => {
-    navigation.navigate("DrugDetailScreen", { props: id });
+    navigation.navigate("DrugDetailScreen", id);
   };
 
   return (
